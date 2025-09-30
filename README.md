@@ -1,4 +1,4 @@
-# Web Scan Light - Analisador de Segurança Web com IA
+# Web Scan Light - Analisador de Segurança Web com IA 🔍
 
 **Web Scan Light** é uma ferramenta de linha de comando simples, projetada para realizar uma análise de segurança preliminar em websites. A ferramenta utiliza um modelo de linguagem grande (LLM) através do [Ollama](https://ollama.com/) para analisar os cabeçalhos HTTP e o conteúdo inicial de uma página, identificando potenciais vulnerabilidades e más configurações de segurança.
 
