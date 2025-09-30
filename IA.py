@@ -2,6 +2,7 @@ from ollama import Client
 import subprocess
 import sys
 
+
 if len(sys.argv) < 2:
     print("Erro: Forneça a URL alvo como argumento.", file=sys.stderr)
     print(f"Uso: python {sys.argv[0]} <URL_ALVO>", file=sys.stderr)
@@ -9,6 +10,9 @@ if len(sys.argv) < 2:
 
 target_url = sys.argv[1]
 client = Client()
+
+sanitized_url = target_url.replace('https://', '').replace('http://', '').replace('/', '_').replace('.', '_')
+report_filename = f"relatorio_{sanitized_url}.md"
 
 prompt= """
 Analise o seguinte conteúdo e cabeçalho HTTP.
@@ -114,5 +118,17 @@ message = [
     }
 ]
 
+
+print(f"Analisando {target_url} e gerando relatório...")
+full_response = []
 for part in client.chat('gpt-oss:120b-cloud', messages=message, stream=True):
   print(part['message']['content'], end='', flush=True)
+  content = part['message']['content']
+  full_response.append(content)
+
+print(f"\n\n--- Fim da Análise ---")
+
+with open(report_filename, "w", encoding="utf-8") as f:
+    f.write("".join(full_response))
+
+print(f"[+] Relatório salvo com sucesso em: {report_filename}")
