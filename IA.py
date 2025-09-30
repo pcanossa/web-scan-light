@@ -26,7 +26,7 @@ Forneça um resumo executivo em bullet points destacando:
 
 ##MODELO DE RESPOSTA##
 
-- **Pontos críticos da resposta HTTP** – Código 200 com conteúdo HTML grande (≈150 KB) e compressão **gzip**. A presença de numerosos scripts de terceiros (Google Tag Manager, DoubleClick, tags.globo.com, etc.) aumenta a superfície de ataque.  
+- **Pontos críticos da resposta HTTP** – Código 200 com conteúdo HTML grande (≈150 KB) e compressão **gzip**. A presença de numerosos scripts de terceiros (Google Tag Manager, DoubleClick, tags.gk.com, etc.) aumenta a superfície de ataque.  
 - **Cabeçalhos de segurança insuficientes** – CSP limitada a `upgrade‑insecure‑requests`; ausentes **Strict‑Transport‑Security**, **X‑Frame‑Options**, **Permissions‑Policy**, **Referrer‑Policy** e **Content‑Security‑Policy** com diretivas de origem.  
 - **Info leakage** – Headers internos (`X‑Request‑Id`, `X‑Bip`, `X‑Thanos`, `Show‑Page‑Version`, `X‑Served‑From`, `Via`) revelam detalhes de infraestrutura e podem ser usados para fingerprinting ou exploração de vulnerabilidades conhecidas.  
 - **Risco de XSS/CSRF** – Scripts de terceiros e ausência de políticas CSP restritivas favorecem injeção de código e cross‑site scripting.  
@@ -40,7 +40,7 @@ Forneça um resumo executivo em bullet points destacando:
 | Observação | Impacto | Comentário |
 |------------|---------|------------|
 | **Tamanho do payload (151 KB)** | Médio | Maior consumo de banda e aumento da janela de ataque para compressão (BREACH) caso dados sensíveis sejam refletidos. |
-| **Uso de scripts de terceiros** (gpt.js, tags.globo.com, tiqcdn.com, etc.) | Alto | Cada recurso externo pode ser comprometido ou servir como vetor de XSS/supply‑chain. |
+| **Uso de scripts de terceiros** (gpt.js, tags.gk.com, tiqcdn.com, etc.) | Alto | Cada recurso externo pode ser comprometido ou servir como vetor de XSS/supply‑chain. |
 | **Presença de variáveis globais (`window.cdaaas`, `window.utag_data`)** | Médio | Se controláveis por parâmetros de query ou cabeçalhos, podem ser manipuladas para injeção de código. |
 | **Falta de marcação de CSP no HTML** | Crítico | Sem `script-src`, `style-src`, `object-src` etc., o navegador aceita qualquer origem que o script indique, facilitando XSS. |
 
