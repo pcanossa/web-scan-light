@@ -49,10 +49,18 @@ Antes de executar, garanta que você tenha os seguintes componentes instalados e
     ```
 3.  **Ollama**:
     - Faça o download e instale o Ollama.
+    - Iniciar o servidor ollama
+     ```bash
+      ollama start
+     ```
     - Baixe um modelo de linguagem robusto. O modelo `gpt-oss:120b-cloud` foi usado no desenvolvimento, mas outros modelos grandes também podem funcionar.
       ```bash
       ollama pull gpt-oss:120b-cloud
       ```
+    - Iniciar serviço de chat `gpt-oss:120b-cloud` **(Necessário somente na primeira vez que executar o script)**
+      ```bash
+      ollama run gpt-oss:120b-cloud
+     ``` 
     - Certifique-se de que o serviço do Ollama esteja em execução antes de rodar o script.
 
 ## Como Usar
