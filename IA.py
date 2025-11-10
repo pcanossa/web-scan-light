@@ -1,12 +1,19 @@
 from ollama import Client
 import subprocess
 import sys
+import os
 
 
 if len(sys.argv) < 2:
     print("Erro: Forneça a URL alvo como argumento.", file=sys.stderr)
     print(f"Uso: python {sys.argv[0]} <URL_ALVO>", file=sys.stderr)
     sys.exit(1)
+
+if "-t"in sys.argv or "--test" in sys.argv:
+    print("Modo de teste ativado. Executando request.py com URL de teste...")
+    test_url = "http://toscrape.com"
+    subprocess.run([sys.executable, 'request.py', test_url])
+    sys.exit(0)
 
 target_url = sys.argv[1]
 client = Client()
@@ -25,7 +32,11 @@ Forneça um resumo executivo em bullet points destacando:
 4. Responder de **forma concisa e direta**, evitando informações desnecessárias.
 
 ##MODELO DE RESPOSTA##
+**Não copiar conteúdo do modelo, apenas seguir a estrutura.**
 
+# Relatório de Análise de Vulnerabilidades HTTP
+
+## Resumo Executivo
 - **Pontos críticos da resposta HTTP** – Código 200 com conteúdo HTML grande (≈150 KB) e compressão **gzip**. A presença de numerosos scripts de terceiros (Google Tag Manager, DoubleClick, tags.gk.com, etc.) aumenta a superfície de ataque.  
 - **Cabeçalhos de segurança insuficientes** – CSP limitada a `upgrade‑insecure‑requests`; ausentes **Strict‑Transport‑Security**, **X‑Frame‑Options**, **Permissions‑Policy**, **Referrer‑Policy** e **Content‑Security‑Policy** com diretivas de origem.  
 - **Info leakage** – Headers internos (`X‑Request‑Id`, `X‑Bip`, `X‑Thanos`, `Show‑Page‑Version`, `X‑Served‑From`, `Via`) revelam detalhes de infraestrutura e podem ser usados para fingerprinting ou exploração de vulnerabilidades conhecidas.  
@@ -59,7 +70,7 @@ Forneça um resumo executivo em bullet points destacando:
 | **Expires** | Compatível com Cache‑Control | OK. |
 | **X‑Request‑Id, X‑Bip, X‑Thanos, Show‑Page‑Version, X‑Served‑From, Via** | **Informação interna** | Facilita fingerprinting e pode ajudar na enumeração de versões ou componentes vulneráveis. | Remover ou mascarar informações internas; usar cabeçalhos genéricos ou nada. |
 | **Content‑Encoding: gzip** | Positivo | Reduz tamanho da resposta; porém pode ser vetado a ataques de compressão (BREACH) se houver reflexão de dados sensíveis. | Desativar gzip para respostas que contenham dados de usuário refletidos ou usar técnicas de mitigação (randomização, limite de tamanho). |
-| **Server** (não exibido) | **Possível vazamento** | Caso exista, pode revelar tecnologia/versão. | Remover ou setar para valor genérico (`Server: hidden`). |
+| **Server** | **Possível vazamento** | Caso exista, pode revelar tecnologia/versão. | Remover ou setar para valor genérico (`Server: hidden`). |
 
 ### 3. Vulnerabilidades Identificadas  
 
@@ -103,6 +114,9 @@ if process.returncode != 0:
 
 http_content = process.stdout
 
+wapiti_report_filename = f"wapiti_report_{sanitized_url}.txt"
+wapiti_report = subprocess.run(['wapiti', '-u', target_url, '-f', 'txt', '-o', wapiti_report_filename])
+
 message = [
     {
         'role': 'system',
@@ -114,10 +128,9 @@ message = [
     },
     {
       'role': 'user',
-      'content': http_content
+      'content': [http_content, wapiti_report.stdout]
     }
 ]
-
 
 print(f"Analisando {target_url} e gerando relatório...")
 full_response = []
