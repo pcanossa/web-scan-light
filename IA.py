@@ -114,8 +114,23 @@ if process.returncode != 0:
 
 http_content = process.stdout
 
-wapiti_report_filename = f"wapiti_report_{sanitized_url}.txt"
-wapiti_report = subprocess.run(['wapiti', '-u', target_url, '-f', 'txt', '-o', wapiti_report_filename])
+# --- MODIFICAÇÃO ---
+# O Wapiti pode demorar muito. Em vez de executá-lo e esperar,
+# vamos apenas ler o relatório JSON que ele gera.
+# Isso permite que você execute o Wapiti separadamente.
+wapiti_report_filename = f"wapiti_report_{sanitized_url}.json"
+wapiti_content = ""
+
+print(f"\n[+] Tentando ler o relatório do Wapiti: {wapiti_report_filename}")
+print(f"[*] Se o relatório não existir, execute o Wapiti separadamente com o comando:")
+print(f"[*] wapiti -u {target_url} -f json -o {wapiti_report_filename}\n")
+
+if os.path.exists(wapiti_report_filename):
+    with open(wapiti_report_filename, 'r', encoding='utf-8') as f:
+        wapiti_content = f.read()
+    print("[+] Relatório do Wapiti carregado com sucesso.")
+else:
+    print("[!] Relatório do Wapiti não encontrado. A análise da IA prosseguirá sem esses dados.")
 
 message = [
     {
@@ -128,7 +143,7 @@ message = [
     },
     {
       'role': 'user',
-      'content': [http_content, wapiti_report.stdout]
+      'content': f"## Conteúdo HTTP Obtido via 'request.py':\n{http_content}\n\n## Conteúdo do Relatório Wapiti (JSON):\n{wapiti_content}"
     }
 ]
 
